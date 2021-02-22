@@ -30,4 +30,4 @@ Create a text file in the file path folder called disable.txt
 i.e. C:\Export\disable.txt
 
 Add the IDs of the zendesk user account to delete.
-5590112547,5590112557,5593694908,5640624927
+55901547,559011,559368,5640927
