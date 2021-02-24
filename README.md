@@ -31,3 +31,6 @@ i.e. C:\Export\disable.txt
 
 Add the IDs of the zendesk user account to delete.
 55901547,559011,559368,5640927
+
+#Install
+Install the Windows .NET core runtime from Windows

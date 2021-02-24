@@ -16,7 +16,7 @@ namespace ZendeskUserRemoval
         static void Main(string[] args)
         {
             Prompt();
-            Thread.Sleep(100000);
+            Thread.Sleep(3000000);
         }
 
         public static void Prompt()
@@ -88,13 +88,18 @@ namespace ZendeskUserRemoval
                         Console.WriteLine("parsing list");
                         response = await client.DeleteAsync($"/api/v2/users/" + s + ".json");
                         Console.WriteLine("Deleted: " + response.StatusCode);
+                        if (response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
+                        {
+                            Console.WriteLine("Failed to write delete: " + s);
+                            ExportLog(s.ToString());
+                        }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    Console.WriteLine("Failed Query: " +  ex.Message);
                 }
-                }
+            }
         }
 
         public static async void GetUsers()
@@ -175,7 +180,7 @@ namespace ZendeskUserRemoval
                         } catch (Exception ex)
                         {
                             ExportResults(collectionCsv);
-                            Console.WriteLine("nextUrl was null" +ex);
+                            Console.WriteLine("Not an issue... The NextUrl was null : " +ex);
                             
                         }
                         
@@ -188,6 +193,50 @@ namespace ZendeskUserRemoval
                 
             }
            
+        }
+
+        public static void ExportLog(string txt)
+        {
+            try
+            {
+                System.IO.Directory.CreateDirectory(ConfigurationManager.AppSettings["filePath"]);
+            }
+            catch
+            {
+                //Console.WriteLine("Folder already exists");
+            }
+
+            try
+            {
+
+                string path = ConfigurationManager.AppSettings["filePath"];
+                Console.WriteLine(path);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                string filepath = path + "\\log.txt";
+                if (!File.Exists(filepath))
+                {
+                    // Create a file to write to.   
+                    using (StreamWriter sw = File.CreateText(filepath))
+                    {
+                        sw.WriteLine(DateTime.Now + " : " + txt);
+                    }
+                }
+                else
+                {
+                    using (StreamWriter sw = File.AppendText(filepath))
+                    {
+                        sw.WriteLine(DateTime.Now + " : " + txt);
+                    }
+                }
+            }
+            catch
+            {
+                //Console.WriteLine("Unable to write file or it already exists");
+            }
+
         }
 
         public static void ExportResults(List<string> inCollection)
